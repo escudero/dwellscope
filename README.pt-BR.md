@@ -7,12 +7,14 @@
 > Um estudo pessoal de **Claudio Escudero** ([linkedin.com/in/claudioescudero](https://www.linkedin.com/in/claudioescudero/)). Não é um produto nem uma biblioteca. O código está aberto para quem quiser ler, reproduzir os resultados e testar nos próprios vídeos.
 
 <p align="center">
-  <img src="docs/media/restricted_room_annotated.gif" width="560" alt="Vídeo de exemplo anotado: cada pessoa recebe caixa e nome ao passar pela porta, com o contador de quem está dentro e o registro das visitas no final">
+  <img src="docs/media/chirla_door.gif" width="560" alt="Câmera real de escritório (CHIRLA): pessoas entram pela porta e são reconhecidas pelo rosto">
 </p>
 
 **A pergunta:** câmaras frias, áreas de radiação, salas de máquinas e cofres têm limite de tempo por segurança. Uma câmera só, na porta, consegue auditar quanto tempo cada funcionário passou lá dentro? Quem entra está de frente para a câmera, então o rosto identifica a pessoa. Quem sai mostra só as costas, então o sistema precisa reconhecê-la pela roupa, pelo cabelo e pela altura.
 
 **Resposta curta (vídeo real de escritório, 7 dias):** a ideia se sustenta, e o ponto fraco é a porta. Em 47 minutos de um escritório real, com 14 pessoas ao longo de 7 dias, o rosto identificou 86% de quem entrou. No teste de saída, roupa e cabelo identificaram todos os que saíram de costas (11 de 11; o acaso daria 47%). A roupa só serve dentro do mesmo dia: os participantes trocaram de roupa entre as sessões, e o rosto é o que liga um dia ao outro. O registro de tempo na sala teve erro mediano de 13 s por pessoa por dia, e metade das linhas ficou dentro de 10 s. O resto do erro vem da própria porta. O rastreador perdeu 22% das passagens numa porta pequena e cheia, e uma saída perdida deixa a pessoa "dentro" até o fim da gravação.
+
+<p align="center"><img src="docs/media/chirla_log.png" width="640" alt="Tempo no escritório por pessoa por dia, sistema contra o gabarito"></p>
 
 O estudo teve duas fases: um MVP em vídeo sintético, com gabarito exato, e depois vídeo real. As duas estão relatadas abaixo.
 
@@ -92,6 +94,8 @@ Onze saídas é um teste pequeno. Ainda assim, o resultado concorda com o do sin
 ## Resultados no vídeo sintético (MVP)
 
 Passagens pela porta: 46 de 49 encontradas, com 2 falsas (precisão 96%, recall 94%). O certo é 9 pessoas.
+
+<p align="center"><img src="docs/media/smartspaces_table.png" width="560" alt="Cena sintética: tempo na sala por pessoa, sistema contra o gabarito"></p>
 
 | Pistas | Entradas com o nome certo | Saídas com o nome certo | Pessoas | Erro médio no tempo dentro |
 |---|---|---|---|---|
@@ -244,7 +248,7 @@ scripts/
                         camera1_files.txt (a lista de arquivos do ScienceDB)
   smartspaces/          MVP sintético: 01_ground_truth … 06_video, config.py (sala, calibração)
 samples/                o arquivo da porta do vídeo de exemplo, e onde baixar o vídeo (YouTube)
-docs/media/             os GIFs deste README, feitos a partir do vídeo de exemplo
+docs/media/             as imagens deste README, nomeadas pela fonte dos dados
 data/raw/{chirla,smartspaces}/      dados baixados, ignorados pelo git
 data/output/{chirla,smartspaces}/   tudo o que os pipelines geram, ignorado pelo git
 weights/                pesos dos modelos baixados, ignorados pelo git
@@ -263,7 +267,7 @@ weights/                pesos dos modelos baixados, ignorados pelo git
 ## Créditos e licenças
 
 - **Código** deste repositório: © 2026 Claudio Escudero, [CC BY-NC 4.0](LICENSE) ([resumo](https://creativecommons.org/licenses/by-nc/4.0/deed.pt-br)). Pode usar, estudar, modificar e compartilhar com crédito, só para fins não comerciais. As bibliotecas e os pesos que ele usa têm licenças próprias, e duas delas restringem ainda mais o uso: o YOLO11 é AGPL-3.0, e os pesos de rosto `buffalo_l` são só para pesquisa não comercial.
-- **Dados:** [CHIRLA](https://github.com/bdager/CHIRLA) (Dominguez-Dager, Escalona, Gomez-Donoso e Cazorla, Universidade de Alicante), CC BY 4.0. [NVIDIA PhysicalAI-SmartSpaces](https://huggingface.co/datasets/nvidia/PhysicalAI-SmartSpaces), CC BY 4.0. O vídeo de exemplo (no YouTube, veja `samples/README.md`) e os `docs/media/restricted_room_*.gif` são do autor.
+- **Dados:** [CHIRLA](https://github.com/bdager/CHIRLA) (Dominguez-Dager, Escalona, Gomez-Donoso e Cazorla, Universidade de Alicante), CC BY 4.0. [NVIDIA PhysicalAI-SmartSpaces](https://huggingface.co/datasets/nvidia/PhysicalAI-SmartSpaces), CC BY 4.0. As imagens `chirla_*` e `smartspaces_*` em `docs/media/` são adaptadas deles (com os nomes, a linha da porta e o registro do sistema desenhados sobre o vídeo) e continuam sob CC BY 4.0. O vídeo de exemplo (no YouTube, veja `samples/README.md`) e os `docs/media/restricted_room_*.gif` são do autor.
 - [YOLO11-pose](https://github.com/ultralytics/ultralytics) (Ultralytics), AGPL-3.0, com o rastreador BoT-SORT (Aharon et al., 2022) na implementação da Ultralytics.
 - [InsightFace](https://github.com/deepinsight/insightface) `buffalo_l`: SCRFD (Guo et al., ICLR 2022) e ArcFace (Deng et al., CVPR 2019). O código é MIT; os pesos `buffalo_l` são só para pesquisa não comercial.
 - [CLIP-ReID](https://github.com/Syliz517/CLIP-ReID) (Li et al., AAAI 2023), MIT, treinado no Market-1501. Exportação ONNX: `occurra/person_vit_clip_reid`.

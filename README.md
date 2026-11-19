@@ -7,12 +7,14 @@
 > A personal study by **Claudio Escudero** ([linkedin.com/in/claudioescudero](https://www.linkedin.com/in/claudioescudero/)). It is not a product or a library. The code is shared so others can read it, reproduce the results and try it on their own data.
 
 <p align="center">
-  <img src="docs/media/restricted_room_annotated.gif" width="560" alt="Sample clip, annotated: each person is boxed and named as they cross the door, with an inside-now counter and the visit log at the end">
+  <img src="docs/media/chirla_door.gif" width="560" alt="Real office camera (CHIRLA): people walk in through the door and are named by face">
 </p>
 
 **The question:** cold rooms, radiation areas, machine rooms and vaults have a time limit for safety. Can one camera at the door audit how long each worker spent inside? Entries face the camera, so the face can name the person. Exits show only their back, so the system has to recognize them by clothes, hair and height.
 
 **Short answer (real office video, 7 days):** the idea holds, and the door is the weak part. On 47 minutes of a real office with 14 people over 7 days, the face named 86% of the people walking in, and clothes and hair named everyone leaving with their back to the camera in the exit test (11 of 11; chance was 47%). Clothes only work within a day: the participants changed outfits between sessions, so the face is what links the days. The time-in-room log had a median error of 13 s per person per day, and half the rows were within 10 s. The rest broke on the door itself. The tracker missed 22% of the crossings in a small, crowded doorway, and one missed exit keeps a person "inside" until the recording ends.
+
+<p align="center"><img src="docs/media/chirla_log.png" width="640" alt="Time in the office per person per day, system against ground truth"></p>
 
 The study ran in two phases: an MVP on synthetic video with exact ground truth, then real video. Both are reported below.
 
@@ -92,6 +94,8 @@ Eleven exits is a small test. Even so, it agrees with the synthetic one below (9
 ## Results on synthetic video (MVP)
 
 Door crossings: 46 of 49 found, with 2 false ones (precision 96%, recall 94%). The truth is 9 people.
+
+<p align="center"><img src="docs/media/smartspaces_table.png" width="560" alt="Synthetic scene: time in the room per person, system against ground truth"></p>
 
 | Cues | Entries named right | Exits named right | People | Mean error in time inside |
 |---|---|---|---|---|
@@ -244,7 +248,7 @@ scripts/
                         camera1_files.txt (the ScienceDB file list)
   smartspaces/          synthetic MVP: 01_ground_truth … 06_video, config.py (room, calibration)
 samples/                the sample clip's door file, and where to download the clip (YouTube)
-docs/media/             the GIFs in this README, made from the sample clip
+docs/media/             the images in this README, named by data source
 data/raw/{chirla,smartspaces}/      downloaded data, ignored by git
 data/output/{chirla,smartspaces}/   everything the pipelines write, ignored by git
 weights/                downloaded model weights, ignored by git
@@ -263,7 +267,7 @@ weights/                downloaded model weights, ignored by git
 ## Credits and licenses
 
 - **Code** in this repository: © 2026 Claudio Escudero, [CC BY-NC 4.0](LICENSE) ([summary](https://creativecommons.org/licenses/by-nc/4.0/)). Use it, study it, change it and share it with credit, for non-commercial purposes only. The libraries and weights it runs on keep their own licenses, and two of them restrict use further: YOLO11 is AGPL-3.0, and the `buffalo_l` face weights are for non-commercial research only.
-- **Data:** [CHIRLA](https://github.com/bdager/CHIRLA) (Dominguez-Dager, Escalona, Gomez-Donoso and Cazorla, University of Alicante), CC BY 4.0. [NVIDIA PhysicalAI-SmartSpaces](https://huggingface.co/datasets/nvidia/PhysicalAI-SmartSpaces), CC BY 4.0. The sample clip (on YouTube, see `samples/README.md`) and the `docs/media/restricted_room_*.gif` are the author's.
+- **Data:** [CHIRLA](https://github.com/bdager/CHIRLA) (Dominguez-Dager, Escalona, Gomez-Donoso and Cazorla, University of Alicante), CC BY 4.0. [NVIDIA PhysicalAI-SmartSpaces](https://huggingface.co/datasets/nvidia/PhysicalAI-SmartSpaces), CC BY 4.0. The `chirla_*` and `smartspaces_*` images in `docs/media/` are adapted from them (the system's names, door line and log drawn over the video) and stay under CC BY 4.0. The sample clip (on YouTube, see `samples/README.md`) and the `docs/media/restricted_room_*.gif` are the author's.
 - [YOLO11-pose](https://github.com/ultralytics/ultralytics) (Ultralytics), AGPL-3.0, with the BoT-SORT tracker (Aharon et al., 2022) as implemented in Ultralytics.
 - [InsightFace](https://github.com/deepinsight/insightface) `buffalo_l`: SCRFD (Guo et al., ICLR 2022) and ArcFace (Deng et al., CVPR 2019). The code is MIT; the `buffalo_l` weights are for non-commercial research only.
 - [CLIP-ReID](https://github.com/Syliz517/CLIP-ReID) (Li et al., AAAI 2023), MIT, trained on Market-1501. ONNX export: `occurra/person_vit_clip_reid`.
