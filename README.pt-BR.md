@@ -28,6 +28,14 @@ O CHIRLA não tem calibração de câmera, então tudo está em pixels. A câmer
 
 **MVP sintético: [NVIDIA PhysicalAI-SmartSpaces](https://huggingface.co/datasets/nvidia/PhysicalAI-SmartSpaces)** (AI City Challenge 2025, CC BY 4.0). Vídeo de várias câmeras calibradas, com uma caixa 3D para cada pessoa em cada quadro. A cena de validação `Hospital_000` tem 5 minutos a 30 fps e 41 pessoas. Um salão com um lado aberto faz o papel da sala restrita (paredes em x = −32,4 m e x = −23,5 m, porta em y = 16 m), e a `Camera_21`, dentro dele, olha para a porta. As caixas 3D dão 49 passagens pela porta, de 9 pessoas, a altura real de cada uma e o tempo exato que cada uma ficou dentro.
 
+**Onde baixar.** Nenhum dado está no repositório. Os comandos estão em [Como reproduzir](#como-reproduzir).
+
+| Dados | O que o estudo usa | Tamanho | Download | Licença |
+|---|---|---|---|---|
+| CHIRLA | Câmera 1: 10 vídeos e as anotações de identidade | 1,36 GB + 21 MB | [ScienceDB](https://doi.org/10.57760/sciencedb.20543), sem conta (baixado pelo [`00_download.py`](scripts/chirla/00_download.py)), ou o [espelho no Hugging Face](https://huggingface.co/datasets/bdager/CHIRLA), depois de aceitar os termos | CC BY 4.0 |
+| NVIDIA PhysicalAI-SmartSpaces | A cena de validação `Hospital_000`: `Camera_21`, calibração e gabarito 3D | ~0,6 GB | [Hugging Face](https://huggingface.co/datasets/nvidia/PhysicalAI-SmartSpaces/tree/main/MTMC_Tracking_2025/val/Hospital_000), sem conta (`curl`) | CC BY 4.0 |
+| Exemplo `restricted_room` | Um vídeo de 45 s, para o [`dwellscope.py`](scripts/dwellscope.py) | 31 MB | [YouTube](https://youtu.be/CjTEk33Sr8Y), com `yt-dlp` (veja [`samples/README.md`](samples/README.md)) | do autor |
+
 ## Como funciona
 
 ```mermaid
