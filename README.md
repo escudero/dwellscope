@@ -18,6 +18,8 @@
 
 The study ran in two phases: an MVP on synthetic video with exact ground truth, then real video. Both are reported below.
 
+**To run it on your own video**, you only need [`scripts/dwellscope.py`](#trying-your-own-video). The `chirla/` and `smartspaces/` scripts reproduce the study's results and are not needed for that.
+
 ## The data
 
 **Real video: [CHIRLA](https://github.com/bdager/CHIRLA)** (Dominguez-Dager et al., 2025, [arXiv 2502.06681](https://arxiv.org/abs/2502.06681), CC BY 4.0). A university lab building in Alicante, filmed on 7 days between June and December 2023 by 7 cameras, with 22 people who agreed to public release. Every person has an identity box in every frame, and the same number is the same person on every day. The participants were asked to change clothes between sessions.
@@ -205,7 +207,7 @@ Everything a pipeline writes goes to `data/output/{chirla,smartspaces}/`, which 
 
 ### Trying your own video
 
-[`scripts/dwellscope.py`](scripts/dwellscope.py) runs the whole pipeline on any one video, with no ground truth: video and door file in, JSON history out, and an annotated video if you ask for one. It needs steps 1 and 2 above. Everything runs on the CPU; a GPU speeds up tracking when there is one.
+[`scripts/dwellscope.py`](scripts/dwellscope.py) runs the whole pipeline on any one video, with no ground truth: video and door file in, JSON history out, and an annotated video if you ask for one. You do not need the `chirla/` or `smartspaces/` scripts, or their data: only steps 1 and 2 above (environment and weights). Everything runs on the CPU; a GPU speeds up tracking when there is one.
 
 **The sample.** `restricted_room` is a 45 s clip (1890 × 1080, 24 fps) from a camera inside a restricted room, looking at its door. Three people go in and out. It is on YouTube, not in the repository: [`samples/README.md`](samples/README.md) has the link and the command that downloads it to `samples/restricted_room.mp4`. Then, from the repository root:
 
@@ -272,11 +274,13 @@ Other flags: `--start` (overrides `start` in the door file), `--cues` (which cue
 
 ```
 scripts/
-  dwellscope.py         one video + door.json -> JSON history (and optional annotated video)
+  dwellscope.py         use it on your own video: one video + door.json -> JSON history
+                        (and optional annotated video)
   botsort_reid.yaml     tracker settings, shared by all pipelines
-  chirla/               real video: 00_download … 06_video, config.py (door lines, track joining),
-                        camera1_files.txt (the ScienceDB file list)
-  smartspaces/          synthetic MVP: 01_ground_truth … 06_video, config.py (room, calibration)
+  chirla/               reproduce the study, real video: 00_download … 06_video,
+                        config.py (door lines, track joining), camera1_files.txt (the ScienceDB file list)
+  smartspaces/          reproduce the study, synthetic MVP: 01_ground_truth … 06_video,
+                        config.py (room, calibration)
 samples/                the sample clip's door file, and where to download the clip (YouTube)
 docs/media/             the images in this README, named by data source
 data/raw/{chirla,smartspaces}/      downloaded data, ignored by git

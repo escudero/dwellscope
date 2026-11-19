@@ -18,6 +18,8 @@
 
 O estudo teve duas fases: um MVP em vídeo sintético, com gabarito exato, e depois vídeo real. As duas estão relatadas abaixo.
 
+**Para rodar no seu próprio vídeo**, você só precisa do [`scripts/dwellscope.py`](#testando-no-seu-próprio-vídeo). Os scripts `chirla/` e `smartspaces/` reproduzem os resultados do estudo e não são necessários para isso.
+
 ## Os dados
 
 **Vídeo real: [CHIRLA](https://github.com/bdager/CHIRLA)** (Dominguez-Dager et al., 2025, [arXiv 2502.06681](https://arxiv.org/abs/2502.06681), CC BY 4.0). Um prédio de laboratórios de uma universidade em Alicante, filmado em 7 dias entre junho e dezembro de 2023 por 7 câmeras, com 22 pessoas que autorizaram a publicação. Cada pessoa tem uma caixa de identidade em cada quadro, e o mesmo número é a mesma pessoa em todos os dias. Os participantes foram orientados a trocar de roupa entre as sessões.
@@ -205,7 +207,7 @@ Tudo o que os pipelines geram vai para `data/output/{chirla,smartspaces}/`, que 
 
 ### Testando no seu próprio vídeo
 
-O [`scripts/dwellscope.py`](scripts/dwellscope.py) roda o pipeline inteiro em qualquer vídeo, sem gabarito. Ele recebe o vídeo e o arquivo da porta, devolve um JSON com o histórico e gera um vídeo anotado se você pedir. Precisa dos passos 1 e 2 acima. Tudo roda na CPU; uma GPU acelera o rastreamento, se houver.
+O [`scripts/dwellscope.py`](scripts/dwellscope.py) roda o pipeline inteiro em qualquer vídeo, sem gabarito. Ele recebe o vídeo e o arquivo da porta, devolve um JSON com o histórico e gera um vídeo anotado se você pedir. Você não precisa dos scripts `chirla/` e `smartspaces/` nem dos dados deles: só dos passos 1 e 2 acima (ambiente e pesos). Tudo roda na CPU; uma GPU acelera o rastreamento, se houver.
 
 **O exemplo.** O `restricted_room` é um vídeo de 45 s (1890 × 1080, 24 fps) de uma câmera dentro de uma sala restrita, olhando para a porta. Três pessoas entram e saem. Ele está no YouTube, não no repositório: o [`samples/README.md`](samples/README.md) tem o link e o comando que o baixa para `samples/restricted_room.mp4`. Depois, a partir da raiz do repositório:
 
@@ -272,11 +274,13 @@ Outros parâmetros: `--start` (substitui o `start` do arquivo da porta), `--cues
 
 ```
 scripts/
-  dwellscope.py         um vídeo + arquivo da porta -> histórico em JSON (e vídeo anotado opcional)
+  dwellscope.py         para usar no seu próprio vídeo: um vídeo + arquivo da porta -> histórico
+                        em JSON (e vídeo anotado opcional)
   botsort_reid.yaml     configurações do rastreador, compartilhadas por todos os pipelines
-  chirla/               vídeo real: 00_download … 06_video, config.py (linhas da porta, união de tracks),
-                        camera1_files.txt (a lista de arquivos do ScienceDB)
-  smartspaces/          MVP sintético: 01_ground_truth … 06_video, config.py (sala, calibração)
+  chirla/               reproduz o estudo, vídeo real: 00_download … 06_video,
+                        config.py (linhas da porta, união de tracks), camera1_files.txt (a lista de arquivos do ScienceDB)
+  smartspaces/          reproduz o estudo, MVP sintético: 01_ground_truth … 06_video,
+                        config.py (sala, calibração)
 samples/                o arquivo da porta do vídeo de exemplo, e onde baixar o vídeo (YouTube)
 docs/media/             as imagens deste README, nomeadas pela fonte dos dados
 data/raw/{chirla,smartspaces}/      dados baixados, ignorados pelo git
