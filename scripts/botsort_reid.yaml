@@ -1,0 +1,14 @@
+# BoT-SORT with appearance matching, for a fixed camera (no global motion compensation).
+# ByteTrack swapped identities when two people crossed in the doorway; appearance keeps them apart.
+tracker_type: botsort
+track_high_thresh: 0.25
+track_low_thresh: 0.1
+new_track_thresh: 0.25
+track_buffer: 60
+match_thresh: 0.8
+fuse_score: True
+gmc_method: none
+proximity_thresh: 0.5
+appearance_thresh: 0.8
+with_reid: True
+model: auto
