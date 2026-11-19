@@ -57,6 +57,28 @@ Os dois pipelines seguem as mesmas regras principais:
 - Passagens opostas do mesmo track em menos de 2 s são alguém parado na porta, e as duas são descartadas.
 - Uma saída só é comparada com as pessoas que o sistema acha que estão dentro.
 
+### Os modelos
+
+Quatro modelos treinados rodam no pipeline. Todos são usados como vêm: nenhum foi treinado ou ajustado para este estudo. Cada um responde a uma pergunta.
+
+| Modelo | Pergunta que responde | Entrada → saída | Tamanho | Treinado em |
+|---|---|---|---|---|
+| **YOLO11s-pose** (Ultralytics, 2024) | Onde está cada pessoa no quadro? | O quadro, redimensionado para 640 px (960 na cena sintética) → uma caixa, uma confiança e 17 pontos do corpo por pessoa | 9,9 M parâmetros, 23,4 GFLOPs, 20 MB | COCO-Pose |
+| **SCRFD-10GF** (`det_10g`, InsightFace `buffalo_l`; Guo et al., 2022) | Há um rosto neste recorte, e onde? | A metade de cima do recorte da pessoa, ampliada para 640 px → caixas de rosto, cinco pontos de referência e um score | 17 MB | WIDER FACE |
+| **ArcFace ResNet-50** (`w600k_r50`, InsightFace `buffalo_l`; Deng et al., 2019) | De quem é este rosto? | Um rosto de 112 × 112, alinhado pelos pontos de referência → um vetor de 512 números | 174 MB | WebFace600K |
+| **CLIP-ReID** (codificador de imagem ViT do CLIP; Li et al., 2023) | Quem está com esta roupa e este cabelo? | O recorte da pessoa, redimensionado para 256 × 128 → um vetor de 512 números | 345 MB (ONNX) | Market-1501 |
+
+Como cada um é usado:
+
+- **YOLO11s-pose** procura só a classe pessoa. A regra da porta usa a base da caixa como ponto do pé, e a altura da caixa dá a altura relativa. Os 17 pontos do corpo são salvos, mas nenhuma regra os usa ainda.
+- **BoT-SORT** (Aharon et al., 2022) liga as caixas de um quadro ao outro, formando os tracks. Não é uma rede separada: ele prevê o movimento de cada caixa com um filtro de Kalman e casa as caixas pela sobreposição e pela aparência, tirada das próprias features do detector. As configurações estão em [`botsort_reid.yaml`](scripts/botsort_reid.yaml): buffer de 60 quadros e sem compensação de movimento da câmera, porque a câmera não se mexe.
+- **SCRFD** roda em até 8 recortes por passagem, escolhidos entre as maiores caixas nos 2 s em volta dela. Um rosto só conta com score de pelo menos 0,60, então a câmera precisa ver o rosto com clareza, o que acontece nas entradas e quase nunca nas saídas.
+- **ArcFace** transforma o melhor rosto num vetor. Dois rostos cujos vetores têm cosseno de 0,25 ou mais são a mesma pessoa. O limiar usual é 0,35; aqui, com uns 25 px, os rostos são pequenos (veja [O que deu errado](#o-que-deu-errado)).
+- **CLIP-ReID** transforma cada recorte num vetor da aparência da pessoa, principalmente roupa e cabelo, e tira a média dos recortes de uma passagem. Ele foi treinado para reidentificar pedestres entre câmeras externas de um campus, vistos de qualquer lado, então funciona de costas também. É ele que identifica as saídas. A roupa muda de um dia para o outro, então esses vetores só são comparados dentro do mesmo dia.
+- **A altura** não é um modelo. É uma reta ajustada no próprio vídeo: altura da caixa em função da posição do pé (veja a etapa 3).
+
+Só os dois modelos de rosto do `buffalo_l` são carregados. Os outros (pontos 3D e 2D do rosto, gênero e idade) ficam desligados. Os quatro modelos rodam na CPU, pelo PyTorch e pelo ONNX Runtime; só o rastreamento ganha muito com uma GPU.
+
 **Tempo de execução.** Numa NVIDIA L4, rastrear as 10 gravações reais leva cerca de 9 min. Numa CPU de 16 threads, a mesma execução levaria umas 8 horas. A cena sintética (9.000 quadros a 960 px) levou 17 min na CPU. As etapas 3 a 6 rodam na CPU em poucos minutos.
 
 ## Resultados no vídeo real (CHIRLA)

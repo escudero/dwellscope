@@ -57,6 +57,28 @@ Both pipelines share the rules that matter:
 - Opposite crossings by the same track within 2 s are someone standing in the doorway, and both are dropped.
 - An exit is matched only against the people the system thinks are inside.
 
+### The models
+
+Four trained models run in the pipeline. They are all off the shelf: none was trained or fine-tuned for this study. Each answers one question.
+
+| Model | Question it answers | In → out | Size | Trained on |
+|---|---|---|---|---|
+| **YOLO11s-pose** (Ultralytics, 2024) | Where is each person in the frame? | The frame, resized to 640 px (960 on the synthetic scene) → a box, a confidence and 17 body keypoints per person | 9.9 M parameters, 23.4 GFLOPs, 20 MB | COCO-Pose |
+| **SCRFD-10GF** (`det_10g`, InsightFace `buffalo_l`; Guo et al., 2022) | Is there a face in this crop, and where? | The top half of a person crop, upscaled to 640 px → face boxes, five landmarks and a score | 17 MB | WIDER FACE |
+| **ArcFace ResNet-50** (`w600k_r50`, InsightFace `buffalo_l`; Deng et al., 2019) | Whose face is this? | A 112 × 112 face, aligned on the landmarks → a 512-number vector | 174 MB | WebFace600K |
+| **CLIP-ReID** (ViT image encoder from CLIP; Li et al., 2023) | Who is wearing these clothes, with this hair? | A person crop, resized to 256 × 128 → a 512-number vector | 345 MB (ONNX) | Market-1501 |
+
+How each one is used:
+
+- **YOLO11s-pose** only looks for the person class. The door rule uses the bottom of the box as the foot point, and the box height gives the relative height. The keypoints are saved, but no rule uses them yet.
+- **BoT-SORT** (Aharon et al., 2022) joins the boxes from frame to frame into tracks. It is not a separate network: it predicts each box's motion with a Kalman filter and matches boxes by overlap and by appearance, taken from the detector's own features. The settings are in [`botsort_reid.yaml`](scripts/botsort_reid.yaml): a 60-frame buffer, and no camera motion compensation, because the camera does not move.
+- **SCRFD** runs on up to 8 crops per crossing, picked among the largest boxes within 2 s of it. A face counts only with a score of at least 0.60, so the camera must see the face clearly, which happens on entries and almost never on exits.
+- **ArcFace** turns the best face into a vector. Two faces whose vectors have a cosine of 0.25 or more are the same person. The usual threshold is 0.35; at about 25 px, the faces here are small (see [What went wrong](#what-went-wrong)).
+- **CLIP-ReID** turns each crop into a vector of how the person looks, mostly clothes and hair, and averages the crops of one crossing. It was trained to re-identify pedestrians between outdoor campus cameras, from any side, so it works from behind too. That is what names the exits. Clothes change between days, so these vectors are only compared within the same day.
+- **Height** is not a model. It is a straight line fitted on the video: box height against foot position (see step 3).
+
+Only the two face models of `buffalo_l` are loaded. Its other models (3D and 2D landmarks, gender and age) are left off. All four models run on the CPU through PyTorch and ONNX Runtime; only the tracking step gains much from a GPU.
+
 **Run time.** On an NVIDIA L4, tracking the 10 real recordings takes about 9 min. On a 16-thread CPU the same run was on course for 8 hours. The synthetic scene (9,000 frames at 960 px) took 17 min on the CPU. Steps 3 to 6 run on the CPU in a few minutes.
 
 ## Results on real video (CHIRLA)
