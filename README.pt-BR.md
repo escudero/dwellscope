@@ -67,14 +67,14 @@ Os dois pipelines seguem as mesmas regras principais:
 
 ### Os modelos
 
-Quatro modelos treinados rodam no pipeline. Todos são usados como vêm: nenhum foi treinado ou ajustado para este estudo. Cada um responde a uma pergunta.
+Quatro modelos treinados rodam no pipeline. Todos são usados como vêm: nenhum foi treinado ou ajustado para este estudo, então os datasets em que foram treinados estão linkados só como referência, sem necessidade de download. Cada modelo responde a uma pergunta.
 
 | Modelo | Pergunta que responde | Entrada → saída | Tamanho | Treinado em |
 |---|---|---|---|---|
-| **YOLO11s-pose** (Ultralytics, 2024) | Onde está cada pessoa no quadro? | O quadro, redimensionado para 640 px (960 na cena sintética) → uma caixa, uma confiança e 17 pontos do corpo por pessoa | 9,9 M parâmetros, 23,4 GFLOPs, 20 MB | COCO-Pose |
-| **SCRFD-10GF** (`det_10g`, InsightFace `buffalo_l`; Guo et al., 2022) | Há um rosto neste recorte, e onde? | A metade de cima do recorte da pessoa, ampliada para 640 px → caixas de rosto, cinco pontos de referência e um score | 17 MB | WIDER FACE |
-| **ArcFace ResNet-50** (`w600k_r50`, InsightFace `buffalo_l`; Deng et al., 2019) | De quem é este rosto? | Um rosto de 112 × 112, alinhado pelos pontos de referência → um vetor de 512 números | 174 MB | WebFace600K |
-| **CLIP-ReID** (codificador de imagem ViT do CLIP; Li et al., 2023) | Quem está com esta roupa e este cabelo? | O recorte da pessoa, redimensionado para 256 × 128 → um vetor de 512 números | 345 MB (ONNX) | Market-1501 |
+| **YOLO11s-pose** (Ultralytics, 2024) | Onde está cada pessoa no quadro? | O quadro, redimensionado para 640 px (960 na cena sintética) → uma caixa, uma confiança e 17 pontos do corpo por pessoa | 9,9 M parâmetros, 23,4 GFLOPs, 20 MB | [COCO](https://cocodataset.org/) keypoints |
+| **SCRFD-10GF** (`det_10g`, InsightFace `buffalo_l`; Guo et al., 2022) | Há um rosto neste recorte, e onde? | A metade de cima do recorte da pessoa, ampliada para 640 px → caixas de rosto, cinco pontos de referência e um score | 17 MB | [WIDER FACE](http://shuoyang1213.me/WIDERFACE/) |
+| **ArcFace ResNet-50** (`w600k_r50`, InsightFace `buffalo_l`; Deng et al., 2019) | De quem é este rosto? | Um rosto de 112 × 112, alinhado pelos pontos de referência → um vetor de 512 números | 174 MB | WebFace600K, part of [WebFace260M](https://www.face-benchmark.org/) |
+| **CLIP-ReID** (codificador de imagem ViT do CLIP; Li et al., 2023) | Quem está com esta roupa e este cabelo? | O recorte da pessoa, redimensionado para 256 × 128 → um vetor de 512 números | 345 MB (ONNX) | [Market-1501](https://zheng-lab-anu.github.io/Project/project_reid.html) |
 
 Como cada um é usado:
 

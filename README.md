@@ -67,14 +67,14 @@ Both pipelines share the rules that matter:
 
 ### The models
 
-Four trained models run in the pipeline. They are all off the shelf: none was trained or fine-tuned for this study. Each answers one question.
+Four trained models run in the pipeline. They are all off the shelf: none was trained or fine-tuned for this study, so the datasets they were trained on are linked for reference only and need no download. Each model answers one question.
 
 | Model | Question it answers | In → out | Size | Trained on |
 |---|---|---|---|---|
-| **YOLO11s-pose** (Ultralytics, 2024) | Where is each person in the frame? | The frame, resized to 640 px (960 on the synthetic scene) → a box, a confidence and 17 body keypoints per person | 9.9 M parameters, 23.4 GFLOPs, 20 MB | COCO-Pose |
-| **SCRFD-10GF** (`det_10g`, InsightFace `buffalo_l`; Guo et al., 2022) | Is there a face in this crop, and where? | The top half of a person crop, upscaled to 640 px → face boxes, five landmarks and a score | 17 MB | WIDER FACE |
-| **ArcFace ResNet-50** (`w600k_r50`, InsightFace `buffalo_l`; Deng et al., 2019) | Whose face is this? | A 112 × 112 face, aligned on the landmarks → a 512-number vector | 174 MB | WebFace600K |
-| **CLIP-ReID** (ViT image encoder from CLIP; Li et al., 2023) | Who is wearing these clothes, with this hair? | A person crop, resized to 256 × 128 → a 512-number vector | 345 MB (ONNX) | Market-1501 |
+| **YOLO11s-pose** (Ultralytics, 2024) | Where is each person in the frame? | The frame, resized to 640 px (960 on the synthetic scene) → a box, a confidence and 17 body keypoints per person | 9.9 M parameters, 23.4 GFLOPs, 20 MB | [COCO](https://cocodataset.org/) keypoints |
+| **SCRFD-10GF** (`det_10g`, InsightFace `buffalo_l`; Guo et al., 2022) | Is there a face in this crop, and where? | The top half of a person crop, upscaled to 640 px → face boxes, five landmarks and a score | 17 MB | [WIDER FACE](http://shuoyang1213.me/WIDERFACE/) |
+| **ArcFace ResNet-50** (`w600k_r50`, InsightFace `buffalo_l`; Deng et al., 2019) | Whose face is this? | A 112 × 112 face, aligned on the landmarks → a 512-number vector | 174 MB | WebFace600K, part of [WebFace260M](https://www.face-benchmark.org/) |
+| **CLIP-ReID** (ViT image encoder from CLIP; Li et al., 2023) | Who is wearing these clothes, with this hair? | A person crop, resized to 256 × 128 → a 512-number vector | 345 MB (ONNX) | [Market-1501](https://zheng-lab-anu.github.io/Project/project_reid.html) |
 
 How each one is used:
 
