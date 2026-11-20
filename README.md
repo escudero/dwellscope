@@ -270,6 +270,29 @@ python scripts/dwellscope.py video.mp4 --door door.json --check door.png   # red
 
 Other flags: `--start` (overrides `start` in the door file), `--cues` (which cues name people: `face+body+height`, `body`, `face`…), `--imgsz` and `--conf` (detector) and `--weights` (weights folder).
 
+**Frame rate.** `dwellscope.py` processes every frame of the video, but it does not need to: a lower frame rate gives the same log, faster. On the sample (24 fps), keeping one frame in N:
+
+| Frames per second | Tracking time (CPU) | Crossings found | Time inside, persons 1 / 2 / 3 |
+|---|---|---|---|
+| 24 (all) | 54 s | 6 of 6 | 38.7 / 16.3 / 18.1 s |
+| 12 | 26 s | 6 of 6 | 38.8 / 16.2 / 18.2 s |
+| 8 | 17 s | 6 of 6 | 38.9 / 16.4 / 18.3 s |
+| 6 | 13 s | 6 of 6 | 38.7 / 16.1 / 18.0 s |
+| 4 | 9 s | 6 of 6 | 38.8 / 16.5 / 18.2 s |
+| 3 | 7 s | 6 of 6 | 39.0 / 16.7 / 18.3 s |
+| 2 | 6 s | 4 of 6 | two visits left open |
+
+At 2 fps it breaks. Walking through the door takes less than a second, and a crossing counts only when the person is seen on both sides of the line, so a person first seen already inside has no entry. The sample is an easy case, though: one person at a time, walking slowly, with nobody in front. On a busy door, like CHIRLA's crowded office, fewer frames will cost more, and that was not measured. **6 to 8 fps is the safe choice.**
+
+To use it, convert the video before running. Nothing in the code changes: `dwellscope.py` reads the frame rate from the file and sets its time windows from it.
+
+```bash
+ffmpeg -i video.mp4 -vf fps=8 -c:v libx264 -crf 18 -an video_8fps.mp4
+python scripts/dwellscope.py video_8fps.mp4 --door door.json --out history.json
+```
+
+On the sample, the 8 fps and 6 fps files gave the same 6 crossings, 3 people and no warnings, in about 30 s in all instead of 90 s. Only tracking gets faster: face and clothes work per crossing, not per frame.
+
 ## Repository layout
 
 ```

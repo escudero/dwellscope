@@ -270,6 +270,29 @@ python scripts/dwellscope.py video.mp4 --door porta.json --check porta.png   # v
 
 Outros parâmetros: `--start` (substitui o `start` do arquivo da porta), `--cues` (as pistas usadas para identificar: `face+body+height`, `body`, `face`…), `--imgsz` e `--conf` (detector) e `--weights` (pasta dos pesos).
 
+**Taxa de quadros.** O `dwellscope.py` processa todos os quadros do vídeo, mas não precisa: uma taxa menor dá o mesmo registro, mais rápido. No exemplo (24 fps), mantendo 1 quadro a cada N:
+
+| Quadros por segundo | Tempo de rastreamento (CPU) | Passagens encontradas | Tempo dentro, pessoas 1 / 2 / 3 |
+|---|---|---|---|
+| 24 (todos) | 54 s | 6 de 6 | 38,7 / 16,3 / 18,1 s |
+| 12 | 26 s | 6 de 6 | 38,8 / 16,2 / 18,2 s |
+| 8 | 17 s | 6 de 6 | 38,9 / 16,4 / 18,3 s |
+| 6 | 13 s | 6 de 6 | 38,7 / 16,1 / 18,0 s |
+| 4 | 9 s | 6 de 6 | 38,8 / 16,5 / 18,2 s |
+| 3 | 7 s | 6 de 6 | 39,0 / 16,7 / 18,3 s |
+| 2 | 6 s | 4 de 6 | duas visitas ficam abertas |
+
+Em 2 fps o resultado quebra. Atravessar a porta leva menos de um segundo, e uma passagem só conta quando a pessoa é vista dos dois lados da linha, então quem aparece pela primeira vez já do lado de dentro fica sem entrada. Mas o exemplo é um caso fácil: uma pessoa por vez, caminhando devagar, sem ninguém na frente. Numa porta movimentada, como o escritório cheio do CHIRLA, menos quadros devem custar mais, e isso não foi medido. **6 a 8 fps é a escolha segura.**
+
+Para usar, converta o vídeo antes de rodar. Nada muda no código: o `dwellscope.py` lê a taxa de quadros do arquivo e ajusta as janelas de tempo por ela.
+
+```bash
+ffmpeg -i video.mp4 -vf fps=8 -c:v libx264 -crf 18 -an video_8fps.mp4
+python scripts/dwellscope.py video_8fps.mp4 --door porta.json --out history.json
+```
+
+No exemplo, os arquivos de 8 fps e 6 fps deram as mesmas 6 passagens, as mesmas 3 pessoas e nenhum aviso, em cerca de 30 s no total, em vez de 90 s. Só o rastreamento fica mais rápido: rosto e roupa são processados por passagem, não por quadro.
+
 ## Estrutura do repositório
 
 ```
